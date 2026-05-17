@@ -51,6 +51,14 @@ jest.mock("@/firebase/providers", () => ({
   signInWithGoogle: jest.fn(),
 }));
 
+jest.mock("@/services/gameService", () => ({
+  __esModule: true,
+  default: {
+    getAll: jest.fn(),
+    getByCategory: jest.fn(),
+  },
+}));
+
 jest.mock("sweetalert2", () => ({
   __esModule: true,
   default: { fire: jest.fn() },
@@ -67,11 +75,9 @@ const createTestStore = (preloadedState?: Partial<RootState>): typeof store =>
     preloadedState,
   });
 
-const mockFetchSuccess = (data: unknown): void => {
-  global.fetch = jest.fn().mockResolvedValue({
-    ok: true,
-    json: async () => await data,
-  } as Response);
+const mockGameServiceGetAll = (data: unknown): void => {
+  const gameService = jest.requireMock("@/services/gameService").default;
+  (gameService.getAll as jest.Mock).mockResolvedValue(data);
 };
 
 const renderPage = (preloadedState?: Partial<RootState>): RenderResult => {
@@ -88,7 +94,7 @@ const renderPage = (preloadedState?: Partial<RootState>): RenderResult => {
 describe("LoginPage", () => {
   describe("rendering", () => {
     beforeEach(() => {
-      mockFetchSuccess(mockGames);
+      mockGameServiceGetAll(mockGames);
     });
 
     it("should render the login form inputs", async () => {
@@ -155,7 +161,7 @@ describe("LoginPage", () => {
 
   describe("behavior", () => {
     beforeEach(() => {
-      mockFetchSuccess(mockGames);
+      mockGameServiceGetAll(mockGames);
       (Swal.fire as jest.Mock).mockResolvedValue({
         isConfirmed: false,
         isDenied: false,

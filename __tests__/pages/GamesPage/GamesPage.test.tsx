@@ -49,17 +49,39 @@ jest.mock("@/firebase/providers", () => ({
   signInWithGoogle: jest.fn(),
 }));
 
+jest.mock("@/services/gameService", () => ({
+  __esModule: true,
+  default: {
+    getAll: jest.fn(),
+    getByCategory: jest.fn(),
+  },
+}));
+
 const createTestStore = (preloadedState?: Partial<RootState>): typeof store =>
   configureStore({
     reducer: { auth: authReducer, games: gamesReducer, ui: uiReducer },
     preloadedState,
   });
 
-const mockFetchSuccess = (data: unknown): void => {
-  global.fetch = jest.fn().mockResolvedValue({
-    ok: true,
-    json: async () => await data,
-  } as Response);
+const mockGameServiceGetAll = (data: unknown): void => {
+  const gameService = jest.requireMock("@/services/gameService").default;
+  (gameService.getAll as jest.Mock).mockResolvedValue(data);
+};
+
+const mockGameServicePending = (): void => {
+  const gameService = jest.requireMock("@/services/gameService").default;
+  (gameService.getAll as jest.Mock).mockImplementation(
+    () =>
+      new Promise(() => {
+        // Empty fn
+      })
+  );
+  (gameService.getByCategory as jest.Mock).mockImplementation(
+    () =>
+      new Promise(() => {
+        // Empty fn
+      })
+  );
 };
 
 const renderPage = (preloadedState?: Partial<RootState>): RenderResult => {
@@ -76,12 +98,7 @@ const renderPage = (preloadedState?: Partial<RootState>): RenderResult => {
 describe("GamesPage", () => {
   describe("rendering", () => {
     it("should render the filters section with Filters heading", () => {
-      global.fetch = jest.fn().mockImplementation(
-        () =>
-          new Promise(() => {
-            // Empty fn
-          })
-      );
+      mockGameServicePending();
 
       renderPage();
 
@@ -89,12 +106,7 @@ describe("GamesPage", () => {
     });
 
     it("should render Loader when isLoadingGames is true", () => {
-      global.fetch = jest.fn().mockImplementation(
-        () =>
-          new Promise(() => {
-            // Empty fn
-          })
-      );
+      mockGameServicePending();
 
       const { container } = renderPage({
         games: {
@@ -109,10 +121,7 @@ describe("GamesPage", () => {
     });
 
     it("should render That category does not exists when games list is empty and not loading", async () => {
-      global.fetch = jest.fn().mockResolvedValue({
-        ok: true,
-        json: () => Promise.resolve([]),
-      } as Response);
+      mockGameServiceGetAll([]);
 
       renderPage();
 
@@ -124,7 +133,7 @@ describe("GamesPage", () => {
     });
 
     it("should render game cards when games are available", async () => {
-      mockFetchSuccess(mockGames);
+      mockGameServiceGetAll(mockGames);
 
       const { container } = renderPage();
 
@@ -136,12 +145,7 @@ describe("GamesPage", () => {
     });
 
     it("should render NavBar and Footer", () => {
-      global.fetch = jest.fn().mockImplementation(
-        () =>
-          new Promise(() => {
-            // Empty fn
-          })
-      );
+      mockGameServicePending();
 
       const { container } = renderPage();
 

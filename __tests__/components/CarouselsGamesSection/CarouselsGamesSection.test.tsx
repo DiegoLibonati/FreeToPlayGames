@@ -41,24 +41,28 @@ jest.mock("firebase/firestore/lite", () => ({
   deleteDoc: jest.fn().mockResolvedValue(undefined),
 }));
 
+jest.mock("@/services/gameService", () => ({
+  __esModule: true,
+  default: {
+    getAll: jest.fn(),
+    getByCategory: jest.fn(),
+  },
+}));
+
 const createTestStore = (preloadedState?: Partial<RootState>): typeof store =>
   configureStore({
     reducer: { auth: authReducer, games: gamesReducer, ui: uiReducer },
     preloadedState,
   });
 
-const mockFetchSuccess = (data: unknown): void => {
-  global.fetch = jest.fn().mockResolvedValue({
-    ok: true,
-    json: async () => await data,
-  } as Response);
+const mockGetByCategorySuccess = (data: unknown): void => {
+  const gameService = jest.requireMock("@/services/gameService").default;
+  (gameService.getByCategory as jest.Mock).mockResolvedValue(data);
 };
 
-const mockFetchError = (): void => {
-  global.fetch = jest.fn().mockResolvedValue({
-    ok: false,
-    status: 500,
-  } as Response);
+const mockGetByCategoryError = (): void => {
+  const gameService = jest.requireMock("@/services/gameService").default;
+  (gameService.getByCategory as jest.Mock).mockRejectedValue(new Error("HTTP error! status: 500"));
 };
 
 const renderComponent = (preloadedState?: Partial<RootState>): RenderResult => {
@@ -85,7 +89,7 @@ describe("CarouselsGamesSection", () => {
 
   describe("behavior", () => {
     it("should render CarouselGames after fetching games by category", async () => {
-      mockFetchSuccess(mockGames);
+      mockGetByCategorySuccess(mockGames);
 
       renderComponent({
         games: {
@@ -103,7 +107,7 @@ describe("CarouselsGamesSection", () => {
 
   describe("edge cases", () => {
     it("should not render any CarouselGames when fetch fails", async () => {
-      mockFetchError();
+      mockGetByCategoryError();
 
       const { container } = renderComponent({
         games: {

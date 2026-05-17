@@ -7,7 +7,7 @@ import Hamburger from "@/components/Hamburger/Hamburger";
 import { useAuthStore } from "@/hooks/useAuthStore";
 import { useUiStore } from "@/hooks/useUiStore";
 
-import assets from "@/assets/export";
+import assets from "@/assets/index";
 
 import "@/components/NavBar/NavBar.css";
 

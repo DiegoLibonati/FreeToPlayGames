@@ -17,7 +17,7 @@ import { useForm } from "@/hooks/useForm";
 
 import { theme } from "@/styles/theme";
 
-import assets from "@/assets/export";
+import assets from "@/assets/index";
 
 import "@/pages/RegisterPage/RegisterPage.css";
 

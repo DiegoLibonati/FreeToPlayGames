@@ -1,6 +1,6 @@
 import type { UpcomingGames } from "@/types/app";
 
-import assets from "@/assets/export";
+import assets from "@/assets/index";
 
 export const imagesOfGames: string[] = [
   assets.images.ApexJpg,

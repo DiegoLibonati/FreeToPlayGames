@@ -47,6 +47,14 @@ jest.mock("@/firebase/providers", () => ({
   signInWithGoogle: jest.fn(),
 }));
 
+jest.mock("@/services/gameService", () => ({
+  __esModule: true,
+  default: {
+    getAll: jest.fn(),
+    getByCategory: jest.fn(),
+  },
+}));
+
 const createTestStore = (preloadedState?: Partial<RootState>): typeof store =>
   configureStore({
     reducer: { auth: authReducer, games: gamesReducer, ui: uiReducer },
@@ -67,7 +75,14 @@ const renderPage = (preloadedState?: Partial<RootState>): RenderResult => {
 describe("HomePage", () => {
   beforeEach(() => {
     jest.useFakeTimers();
-    global.fetch = jest.fn().mockImplementation(
+    const gameService = jest.requireMock("@/services/gameService").default;
+    (gameService.getAll as jest.Mock).mockImplementation(
+      () =>
+        new Promise(() => {
+          // Empty fn
+        })
+    );
+    (gameService.getByCategory as jest.Mock).mockImplementation(
       () =>
         new Promise(() => {
           // Empty fn

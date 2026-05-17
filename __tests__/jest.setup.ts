@@ -1,5 +1,15 @@
 import "@testing-library/jest-dom";
 
-import { TextDecoder, TextEncoder } from "util";
+import { mockMswServer } from "@tests/__mocks__/mswServer.mock";
 
-Object.assign(global, { TextEncoder, TextDecoder });
+beforeAll((): void => {
+  mockMswServer.listen({ onUnhandledRequest: "error" });
+});
+
+afterEach((): void => {
+  mockMswServer.resetHandlers();
+});
+
+afterAll((): void => {
+  mockMswServer.close();
+});

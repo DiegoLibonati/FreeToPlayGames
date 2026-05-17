@@ -18,7 +18,7 @@ The UI is organized around a persistent navigation bar with a responsive hamburg
 
 State is managed globally with Redux Toolkit across three slices: `auth` (user session, login images, error messages), `games` (full catalog, categories, favorites, active game), and `ui` (navbar open state, filter open state, SweetAlert2 alerts). Components never dispatch directly — they interact with the store exclusively through custom hooks (`useAuthStore`, `useGamesStore`, `useUiStore`), keeping the component layer clean and testable.
 
-The project is fully tested with Jest and React Testing Library, covering components, pages, services, and helpers with a minimum 70% coverage threshold across all metrics. Pre-commit hooks via Husky and lint-staged enforce ESLint and Prettier automatically on every commit.
+The project is fully tested with Jest and React Testing Library, covering components, pages, services, and helpers with a minimum 70% coverage threshold across all metrics. HTTP traffic is intercepted at the network layer with MSW (Mock Service Worker) — `gameService` is exercised end-to-end against MSW handlers, while components and pages that consume the service mock the module directly. Pre-commit hooks via Husky and lint-staged enforce ESLint and Prettier automatically on every commit.
 
 ## Technologies used
 
@@ -70,10 +70,12 @@ The project is fully tested with Jest and React Testing Library, covering compon
 "jest": "^30.3.0"
 "jest-environment-jsdom": "^30.3.0"
 "lint-staged": "^15.0.0"
+"msw": "2.10.4"
 "prettier": "^3.0.0"
 "ts-jest": "^29.4.6"
 "typescript": "^5.2.2"
 "typescript-eslint": "^8.0.0"
+"undici": "^7.25.0"
 "vite": "^7.1.6"
 ```
 
@@ -100,6 +102,61 @@ For coverage report:
 
 ```bash
 npm run test:coverage
+```
+
+## Continuous Integration
+
+The repository ships with a **GitHub Actions** pipeline defined in [`.github/workflows/ci.yml`](.github/workflows/ci.yml). It runs automatically on every `push` and `pull_request` targeting the `main` branch. The Node version is pinned via [`.nvmrc`](.nvmrc) and reused by every job through `actions/setup-node` with npm caching enabled.
+
+### Pipeline overview
+
+```
+            ┌─── PR or push to main ───┐
+            ▼                          ▼
+┌──────────────────────┐  ┌──────────────────┐  ┌──────────────────┐
+│    lint-and-audit    │─▶│      testing     │─▶│       build      │
+│ eslint · type-check  │  │  jest (jsdom+MSW)│  │ tsc + vite build │
+└──────────────────────┘  └──────────────────┘  └──────────────────┘
+```
+
+The three jobs run sequentially through the `needs:` chain — `testing` only starts if `lint-and-audit` passes, and `build` only starts if `testing` passes. If any job fails, the downstream jobs are skipped and the run is marked red.
+
+### Validation jobs (run on every PR and push)
+
+1. **`lint-and-audit`** — installs dependencies with `npm ci`, then runs:
+   - `npm run lint` — ESLint with the project config (TypeScript + React Hooks + Prettier).
+   - `npm run type-check` — `tsc -p tsconfig.app.json --noEmit`, full TypeScript check without emitting.
+2. **`testing`** — `npm ci` followed by `npm run test`, which executes the full Jest suite under `jest-environment-jsdom` with MSW intercepting HTTP. Coverage is not collected in CI by default; run `npm run test:coverage` locally to inspect the 70% threshold.
+3. **`build`** — `npm ci` followed by `npm run build`, which runs `tsc -p tsconfig.app.json` and then `vite build` to produce the production bundle under `dist/`. The artifact is ephemeral inside the runner — this job acts as a smoke test that the project compiles end-to-end.
+
+### Skipping a run
+
+To push a change to `main` without triggering CI (e.g. updating non-code files like images or a CODEOWNERS tweak), append GitHub's standard `[skip ci]` marker to the commit message:
+
+```bash
+git commit -m "docs: tweak README screenshot [skip ci]"
+```
+
+### Where the outputs live
+
+| Output                                    | Location                                  |
+| ----------------------------------------- | ----------------------------------------- |
+| Validation logs (lint, type-check, tests) | **Actions** tab on GitHub                 |
+| Production bundle (`dist/`)               | Ephemeral, inside the runner              |
+| Coverage report (local only)              | `coverage/` after `npm run test:coverage` |
+
+### Running the same checks locally
+
+```bash
+# lint-and-audit
+npm run lint
+npm run type-check
+
+# testing
+npm run test
+
+# build
+npm run build
 ```
 
 ## Security Audit

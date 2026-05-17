@@ -9,7 +9,7 @@ import WarframeJpg from "@/assets/images/warframe.jpg";
 import LogoPng from "@/assets/images/logo.png";
 import ParhOfExilePng from "@/assets/images/pathofexile.png";
 
-const assets = {
+export default {
   images: {
     AlbionJpeg: AlbionJpeg,
     ApexJpg: ApexJpg,
@@ -23,5 +23,3 @@ const assets = {
     ParhOfExilePng: ParhOfExilePng,
   },
 };
-
-export default assets;

@@ -1,0 +1,14 @@
+{
+  "recommendations": [
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "editorconfig.editorconfig",
+    "orta.vscode-jest",
+    "ms-azuretools.vscode-docker",
+    "github.vscode-github-actions",
+    "mikestead.dotenv",
+    "yoavbls.pretty-ts-errors",
+    "usernamehw.errorlens",
+    "formulahendry.auto-rename-tag"
+  ]
+}
