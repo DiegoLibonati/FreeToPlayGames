@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router";
 import Swal from "sweetalert2";
 
 import type { SweetAlertIcon } from "sweetalert2";

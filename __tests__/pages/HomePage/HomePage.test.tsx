@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { configureStore } from "@reduxjs/toolkit";
 import { Provider } from "react-redux";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter } from "react-router";
 
 import type { RenderResult } from "@testing-library/react";
 import type { RootState, store } from "@/app/store";

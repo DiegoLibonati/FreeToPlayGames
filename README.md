@@ -40,7 +40,7 @@ The project is fully tested with Jest and React Testing Library, covering compon
 "query-string": "^7.1.1"
 "react": "^19.2.4"
 "react-dom": "^19.2.4"
-"react-router-dom": "7.13.2"
+"react-router": "7.16.0"
 "react-icons": "^4.4.0"
 "react-redux": "^9.2.0"
 "react-wavify": "^1.6.2"

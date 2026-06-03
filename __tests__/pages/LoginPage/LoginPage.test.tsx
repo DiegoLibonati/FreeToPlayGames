@@ -2,7 +2,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { configureStore } from "@reduxjs/toolkit";
 import { Provider } from "react-redux";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter } from "react-router";
 import Swal from "sweetalert2";
 
 import type { RenderResult } from "@testing-library/react";

@@ -1,4 +1,4 @@
-import { useLocation } from "react-router-dom";
+import { useLocation } from "react-router";
 import { FaTrash } from "react-icons/fa";
 import { GrClose, GrFavorite } from "react-icons/gr";
 
