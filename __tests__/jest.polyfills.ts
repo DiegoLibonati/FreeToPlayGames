@@ -29,16 +29,6 @@ Object.defineProperties(globalThis, {
     writable: true,
     configurable: true,
   },
-  MessagePort: {
-    value: NodeWorkerThreads.MessagePort,
-    writable: true,
-    configurable: true,
-  },
-  MessageChannel: {
-    value: NodeWorkerThreads.MessageChannel,
-    writable: true,
-    configurable: true,
-  },
   BroadcastChannel: {
     value: NodeWorkerThreads.BroadcastChannel,
     writable: true,
@@ -46,4 +36,10 @@ Object.defineProperties(globalThis, {
   },
   Blob: { value: NodeBuffer.Blob, writable: true, configurable: true },
   File: { value: NodeBuffer.File, writable: true, configurable: true },
+});
+
+Object.defineProperty(globalThis, "MessagePort", {
+  value: NodeWorkerThreads.MessagePort,
+  writable: true,
+  configurable: true,
 });
